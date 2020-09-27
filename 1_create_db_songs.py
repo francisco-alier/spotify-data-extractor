@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Aug 30 17:34:10 2020
-
-@author: franc
-"""
-
-
 #import packages
 import pandas as pd 
 import spotipy
@@ -20,8 +12,8 @@ sp = spotipy.Spotify()
 from spotipy.oauth2 import SpotifyClientCredentials 
 
 #input user_id and user_secret
-cid ="437cec1bf3fa4e3a92a4e64fac6ca9a0" 
-secret = "522f47e8d436419bab521b474cc385de"
+cid ="" 
+secret = ""
 
 client_credentials_manager = SpotifyClientCredentials(client_id=cid, client_secret=secret)
 
