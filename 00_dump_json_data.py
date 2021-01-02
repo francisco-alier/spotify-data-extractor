@@ -1,6 +1,6 @@
 
 
-# Import the module
+# Import the modules
 import json
 import os
 import pandas as pd
@@ -35,8 +35,8 @@ data = get_streamings()
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials 
 
-cid = ""
-secret = ""
+cid = "437cec1bf3fa4e3a92a4e64fac6ca9a0"
+secret = "522f47e8d436419bab521b474cc385de"
 
 def get_song_info(song_name: str, cid: str, secret: str, type_info: str = 'id'):
     #create the spotify object
@@ -59,11 +59,14 @@ def get_song_info(song_name: str, cid: str, secret: str, type_info: str = 'id'):
     return info
 
 unique_tracks = data['trackName'].unique()
+# 30 characters is the max a name of a song can have to return values!
+
+search = [song[0:30] for song in unique_tracks]
 ids = []
 explicits = []
 pops = []
 
-for idx, name in enumerate(unique_tracks):
+for idx, name in enumerate(search):
     try:
         print(f"{len(unique_tracks) - idx} songs missing")
         id = get_song_info(song_name = name, cid = cid, secret = secret, type_info = 'id')
@@ -104,5 +107,42 @@ def get_features(track_id: str, cid: str, secret: str) -> dict:
         return features[0]
     except:
         return None
+
+features_all = {}   
+count = 0
+for id, track in zip(ids, search):
+
     
-get_features(track_id='7dzwCwvobdoKlIHr9XPZns', cid=cid, secret=secret)
+    print(f"{len(search) - count} songs missing")
+    features = get_features(track_id=id, cid=cid, secret=secret)
+    if features:
+        features_all[track] = features
+        
+    count = count + 1
+    
+df_features = pd.DataFrame(features_all).transpose().reset_index()
+df_features.rename(columns={'index': 'trackName'}, inplace=True)
+
+'''##############   PHASE 4 - Merge all data and save csv #####################'''
+# remove errors
+ids_final = [id for id in ids if id not in 'ERROR']
+explicits_final = [exp for exp in explicits if isinstance(exp, bool)]
+pops_final = [pop for pop in pops if isinstance(pop, int)]
+
+track_no_features = ([v for v in ids_final if v not in list(df_features['id'])])
+
+df_features_int = df_features
+
+# join previous lists into unique dataframe
+df_int = pd.DataFrame(list(zip(ids_final, explicits_final, pops_final)), 
+               columns =['id', 'explicit', 'popularity'])
+
+# Join features and intermediate by track id
+df_final = pd.merge(df_features_int, df_int, how = 'inner', on = 'id')
+
+# drop duplicates
+df_final_no_dup = df_final.drop_duplicates() # perfect shape :)
+
+# join with streaming data
+df_to_export = pd.merge(data, df_final_no_dup, how = 'left', on = 'trackName')
+df_to_export.reset_index(drop=True).to_csv('./data/streaming_data_clean.csv')
