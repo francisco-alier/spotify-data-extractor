@@ -4,4 +4,4 @@
 
 ### If you want to get your own streaming history you can request it on your Spotify account right here:
 
-![alt text](https://github.com/francisco-alier/spotify-streaming/blob/master/images/personal_data.png?raw=true)
+![alt text](https://github.com/francisco-alier/spotify-streaming/blob/master/images/personal_data.PNG?raw=true)
