@@ -35,8 +35,8 @@ data = get_streamings()
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials 
 
-cid = "437cec1bf3fa4e3a92a4e64fac6ca9a0"
-secret = "522f47e8d436419bab521b474cc385de"
+cid = ""
+secret = ""
 
 def get_song_info(song_name: str, cid: str, secret: str, type_info: str = 'id'):
     #create the spotify object
