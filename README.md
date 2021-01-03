@@ -6,8 +6,9 @@ Requirements:
 
   * Only installing the `spotipy` package fro accessing the API using Python. To install it just run your standard line using pip or another package manager of your choosing:
 
-  `python
-  pip install spotipy`
+  ```python
+  pip install spotipy
+  ```
 
 
 Data:
