@@ -71,18 +71,20 @@ def get_song_info(song_name: str, type_info: str = 'id'):
     return info
 
 
+data['query'] = data['trackName'].str[:15] + " " + data['artistName'].str[:14]
 unique_tracks = data['trackName'].unique()
+unique_querys = data['query'].unique()
 # 30 characters is the max a name of a song can have to return values!
 
 
-search = [song[0:30] for song in unique_tracks]
+#search = [song[0:30] for song in unique_tracks]
 ids = []
 explicits = []
 pops = []
 covers = []
 genres = []
 
-for idx, name in enumerate(search):
+for idx, name in enumerate(unique_querys):
     try:
         print(f"{len(unique_tracks) - idx} songs missing")
         
@@ -107,7 +109,7 @@ for idx, name in enumerate(search):
         genres.append('ERROR')
 
 unique_tracks_data = pd.DataFrame({'id': ids,
-                      'name': unique_tracks,
+                      #'name': unique_tracks,
                       'explicit': explicits,
                       'popularity': pops,
                       'genres': genres,
@@ -136,10 +138,10 @@ def get_features(track_id: str, cid: str, secret: str) -> dict:
 
 features_all = {}   
 count = 0
-for id, track in zip(ids, search):
+for id, track in zip(ids, unique_querys):
 
     
-    print(f"{len(search) - count} songs missing")
+    print(f"{len(unique_querys) - count} songs missing")
     features = get_features(track_id=id, cid=cid, secret=secret)
     if features:
         features_all[track] = features
@@ -170,8 +172,8 @@ df_final = pd.merge(df_features_int, df_int, how = 'inner', on = 'id')
 
 # drop duplicates
 df_final_no_dup = df_final.drop_duplicates('id') # perfect shape :)
-
+df_final_no_dup.rename({'trackName': 'query'}, axis = 1, inplace = True)
 # join with streaming data
-df_to_export = pd.merge(data, df_final_no_dup, how = 'left', on = 'trackName')
+df_to_export = pd.merge(data, df_final_no_dup, how = 'left', on = 'query')
 df_to_export.isnull().sum()
 df_to_export.reset_index(drop=True).to_csv('./data/streaming_data_clean_v2.csv')
